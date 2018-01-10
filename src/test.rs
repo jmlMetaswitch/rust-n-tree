@@ -11,7 +11,7 @@ use self::test::Bencher;
 use self::rand::{random, XorShiftRng, Rng};
 
 use self::fixtures::{QuadTreeRegion, Vec2};
-use {NTree, Region};
+use NTree;
 
 #[test]
 fn test_contains() {
@@ -23,7 +23,8 @@ fn test_contains() {
 fn test_insert() {
     let mut ntree = NTree::new(QuadTreeRegion::square(0.0, 0.0, 100.0), 4);
     assert!(ntree.insert(Vec2 { x: 50.0, y: 50.0 }));
-    assert_eq!(ntree.nearby(&Vec2 { x: 40.0, y: 40.0 }), Some(&[Vec2 { x: 50.0, y: 50.0 }] as &[_]));
+    let points = [Vec2 { x: 50.0, y: 50.0 }];
+    assert_eq!(ntree.nearby(&Vec2 { x: 40.0, y: 40.0 }), Some(&points[..]));
 }
 
 #[test]
@@ -45,19 +46,23 @@ fn test_nearby() {
     ntree.insert(Vec2 { x: 80.0, y: 20.0 });
 
     // Bottom left corner
+    let points = [Vec2 { x: 30.0, y: 30.0 },
+                  Vec2 { x: 20.0, y: 20.0 },
+                  Vec2 { x: 10.0, y: 10.0 }];
     assert_eq!(ntree.nearby(&Vec2 { x: 40.0, y: 40.0 }),
-        Some(&[Vec2 { x: 30.0, y: 30.0 },
-              Vec2 { x: 20.0, y: 20.0 },
-              Vec2 { x: 10.0, y: 10.0 }] as &[_]));
+                            Some(&points[..]));
 
     // Top right corner
-    assert_eq!(ntree.nearby(&Vec2 { x: 90.0, y: 90.0 }), Some(&[Vec2 { x: 75.0, y: 75.0 }] as &[_]));
+    let points = [Vec2 { x: 75.0, y: 75.0 }];
+    assert_eq!(ntree.nearby(&Vec2 { x: 90.0, y: 90.0 }), Some(&points[..]));
 
     // Top left corner
-    assert_eq!(ntree.nearby(&Vec2 { x: 20.0, y: 80.0 }), Some(&[Vec2 { x: 40.0, y: 70.0 }] as &[_]));
+    let points = [Vec2 { x: 40.0, y: 70.0 }];
+    assert_eq!(ntree.nearby(&Vec2 { x: 20.0, y: 80.0 }), Some(&points[..]));
 
     // Bottom right corner
-    assert_eq!(ntree.nearby(&Vec2 { x: 94.0, y: 12.0 }), Some(&[Vec2 { x: 80.0, y: 20.0 }] as &[_]));
+    let points = [Vec2 { x: 80.0, y: 20.0 }];
+    assert_eq!(ntree.nearby(&Vec2 { x: 94.0, y: 12.0 }), Some(&points[..]));
 }
 
 #[test]
@@ -122,7 +127,7 @@ fn bench_range_query_large(b: &mut Bencher) {
 }
 
 mod fixtures {
-    use {Region};
+    use Region;
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct QuadTreeRegion {
