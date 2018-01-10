@@ -192,7 +192,7 @@ mod fixtures {
             self.x + self.width > other.x &&
             self.y < other.y + other.height &&
             self.y + self.height > other.y
-        }
+       }
     }
 
     #[test]
@@ -202,9 +202,20 @@ mod fixtures {
 
     #[test]
     fn test_overlaps() {
+        // Simple overlaps with corners in the other region
         assert!(QuadTreeRegion::square(0.0, 0.0, 100.0).overlaps(&QuadTreeRegion::square(50.0, 50.0, 100.0)));
         assert!(QuadTreeRegion::square(0.0, 0.0, 100.0).overlaps(&QuadTreeRegion::square(50.0, -50.0, 100.0)));
+        // Overlaps with no corners of one in the other region
         assert!(QuadTreeRegion::square(0.0, 0.0, 100.0).overlaps(&QuadTreeRegion::square(50.0, -50.0, 200.0)));
+        assert!(QuadTreeRegion::square(50.0, -50.0, 200.0).overlaps(&QuadTreeRegion::square(0.0, 0.0, 100.0)));
+        // Overlap with no corner in the other region
+        assert!(QuadTreeRegion { x:0.0, y: 50.0, width: 200.0, height: 10.0 }
+                    .overlaps(&QuadTreeRegion { x: 50.0, y: 0.0, width: 10.0, height: 200.0 }));
+        // No overlap
+        assert!(!QuadTreeRegion::square(0.0, 0.0, 100.0).overlaps(&QuadTreeRegion::square(300.0, -200.0, 100.0)));
+        assert!(!QuadTreeRegion::square(0.0, 0.0, 100.0).overlaps(&QuadTreeRegion::square(0.0, -200.0, 100.0)));
+        // Abutting counts as no overlap
+        assert!(!QuadTreeRegion::square(0.0, 0.0, 100.0).overlaps(&QuadTreeRegion::square(0.0, 100.0, 100.0)));
     }
 
     #[test]
